@@ -43,10 +43,9 @@
         color: var(--ink);
         overflow-x: hidden;
         opacity: 0;
-        animation: fadeIn 2s ease-in-out forwards
+        animation: fadeIn 2s ease-in-out forwards;
       }
-      
-    
+
       button {
         font: inherit;
       }
@@ -660,8 +659,8 @@
       }
       .music-btn {
         position: fixed;
-        z-index: 10;
-        bottom: 20px;
+        z-index: 999;
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
         left: 20px;
         display: flex;
         align-items: center;
@@ -706,14 +705,12 @@
       }
 
       @keyframes fadeIn {
-       from {
-        opacity: 0;
-        transform: translateY(20px);
+        from {
+          opacity: 0;
         }
-       to {
-        opacity: 1;
-        transform: translateY(0);
-       }
+        to {
+          opacity: 1;
+        }
       }
       @keyframes rise {
         from {
@@ -849,7 +846,7 @@
           grid-column: auto;
         }
         .music-btn {
-          bottom: 13px;
+          bottom: calc(13px + env(safe-area-inset-bottom, 0px));
           left: 13px;
           padding: 11px 14px;
         }
@@ -1143,247 +1140,245 @@
       ><span id="musicLabel">پخش آهنگ</span>
     </button>
 
-    
-<script>
-  // ==============================
-  // Birthday Letter
-  // ==============================
+    <script>
+      // ==============================
+      // Birthday Letter
+      // ==============================
 
-  const openLetter = document.getElementById("openLetter");
-  const letterText = document.getElementById("letterText");
+      const openLetter = document.getElementById("openLetter");
+      const letterText = document.getElementById("letterText");
 
-  openLetter.addEventListener("click", () => {
-    letterText.classList.remove("hidden");
+      openLetter.addEventListener("click", () => {
+        letterText.classList.remove("hidden");
 
-    openLetter.innerHTML =
-      '<svg class="icon"><use href="#i-heart"/></svg> پیامت اینجاست';
+        openLetter.innerHTML =
+          '<svg class="icon"><use href="#i-heart"/></svg> پیامت اینجاست';
 
-    openLetter.disabled = true;
+        openLetter.disabled = true;
 
-    launchConfetti();
-  });
-
-
-  // ==============================
-  // Music System
-  // ==============================
-
-  const audio = document.getElementById("birthdayMusic");
-  const musicToggle = document.getElementById("musicToggle");
-  const musicLabel = document.getElementById("musicLabel");
-
-  let musicStarted = false;
-  let musicAttempting = false;
-
-  // Update music button
-  function updateMusicUI(isPlaying) {
-    musicToggle.classList.toggle("playing", isPlaying);
-
-    musicToggle.setAttribute(
-      "aria-pressed",
-      String(isPlaying)
-    );
-
-    musicLabel.textContent = isPlaying
-      ? "توقف موسیقی"
-      : "پخش آهنگ";
-  }
-
-
-  // Try playing music
-  async function tryPlayMusic() {
-
-    if (!audio || !audio.paused || musicAttempting) {
-      return false;
-    }
-
-    musicAttempting = true;
-
-    try {
-      await audio.play();
-
-      musicStarted = true;
-
-      updateMusicUI(true);
-
-      // Remove automatic playback listeners after success
-      removeMusicListeners();
-
-      return true;
-
-    } catch (error) {
-
-      updateMusicUI(false);
-
-      musicLabel.textContent = "برای پخش آهنگ کلیک کن";
-
-      return false;
-
-    } finally {
-      musicAttempting = false;
-    }
-  }
-
-
-  // ==============================
-  // Automatic Playback
-  // ==============================
-
-  // Try when the website opens
-  window.addEventListener("load", () => {
-    tryPlayMusic();
-  });
-
-
-  // Try after visitor interaction
-  async function resumeMusic(event) {
-
-    // Do not interfere with the music button
-    if (
-      event.target &&
-      event.target.closest &&
-      event.target.closest("#musicToggle")
-    ) {
-      return;
-    }
-
-    if (musicStarted || !audio.paused) {
-      removeMusicListeners();
-      return;
-    }
-
-    await tryPlayMusic();
-  }
-
-
-  // Remove interaction listeners
-  function removeMusicListeners() {
-
-    document.removeEventListener("click", resumeMusic);
-    document.removeEventListener("pointerdown", resumeMusic);
-    document.removeEventListener("touchstart", resumeMusic);
-    document.removeEventListener("wheel", resumeMusic);
-    document.removeEventListener("scroll", resumeMusic);
-    document.removeEventListener("keydown", resumeMusic);
-
-  }
-
-
-  // Listen for interactions
-  document.addEventListener("click", resumeMusic);
-  document.addEventListener("pointerdown", resumeMusic);
-  document.addEventListener("touchstart", resumeMusic);
-  document.addEventListener("wheel", resumeMusic);
-  document.addEventListener("scroll", resumeMusic);
-  document.addEventListener("keydown", resumeMusic);
-
-
-  // ==============================
-  // Music Toggle Button
-  // ==============================
-
-  musicToggle.addEventListener("click", async () => {
-
-    if (audio.paused) {
-
-      await tryPlayMusic();
-
-    } else {
-
-      audio.pause();
-
-      updateMusicUI(false);
-
-    }
-
-  });
-
-
-  // Update button when audio changes
-  audio.addEventListener("play", () => {
-    updateMusicUI(true);
-  });
-
-  audio.addEventListener("pause", () => {
-    updateMusicUI(false);
-  });
-
-
-  // Audio loading errors
-  audio.addEventListener("error", () => {
-    musicLabel.textContent = "مشکل در بارگذاری آهنگ";
-  });
-
-
-  // ==============================
-  // Image Fallback
-  // ==============================
-
-  document
-    .querySelectorAll(".gallery-card img, .photo-frame img")
-    .forEach((img) => {
-
-      img.addEventListener("error", () => {
-        img.style.display = "none";
+        launchConfetti();
       });
 
-    });
+
+      // ==============================
+      // Music System
+      // ==============================
+
+      const audio = document.getElementById("birthdayMusic");
+      const musicToggle = document.getElementById("musicToggle");
+      const musicLabel = document.getElementById("musicLabel");
+
+      let musicStarted = false;
+      let musicAttempting = false;
+
+      // Update music button
+      function updateMusicUI(isPlaying) {
+        musicToggle.classList.toggle("playing", isPlaying);
+
+        musicToggle.setAttribute(
+          "aria-pressed",
+          String(isPlaying)
+        );
+
+        musicLabel.textContent = isPlaying
+          ? "توقف موسیقی"
+          : "پخش آهنگ";
+      }
 
 
-  // ==============================
-  // Confetti Animation
-  // ==============================
+      // Try playing music
+      async function tryPlayMusic() {
 
-  function launchConfetti() {
+        if (!audio || !audio.paused || musicAttempting) {
+          return false;
+        }
 
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return;
-    }
+        musicAttempting = true;
 
-    const colors = [
-      "#ff705e",
-      "#ffb650",
-      "#f6a6bb",
-      "#9bcdb6",
-      "#b5a0ec",
-      "#ffd66f"
-    ];
+        try {
+          await audio.play();
 
-    for (let i = 0; i < 48; i++) {
+          musicStarted = true;
 
-      const bit = document.createElement("span");
+          updateMusicUI(true);
 
-      bit.className = "confetti";
+          // Remove automatic playback listeners after success
+          removeMusicListeners();
 
-      bit.style.left = `${Math.random() * 100}vw`;
+          return true;
 
-      bit.style.background =
-        colors[i % colors.length];
+        } catch (error) {
 
-      bit.style.setProperty(
-        "--drift",
-        `${Math.random() * 180 - 90}px`
-      );
+          updateMusicUI(false);
 
-      bit.style.animationDuration =
-        `${3.8 + Math.random() * 2.8}s`;
+          musicLabel.textContent = "برای پخش آهنگ کلیک کن";
 
-      bit.style.animationDelay =
-        `${Math.random() * 0.8}s`;
+          return false;
 
-      document.body.appendChild(bit);
+        } finally {
+          musicAttempting = false;
+        }
+      }
 
-      window.setTimeout(() => {
-        bit.remove();
-      }, 7500);
 
-    }
+      // ==============================
+      // Automatic Playback
+      // ==============================
 
-  }
+      // Try when the website opens
+      window.addEventListener("load", () => {
+        tryPlayMusic();
+      });
 
-</script>
 
+      // Try after visitor interaction
+      async function resumeMusic(event) {
+
+        // Do not interfere with the music button
+        if (
+          event.target &&
+          event.target.closest &&
+          event.target.closest("#musicToggle")
+        ) {
+          return;
+        }
+
+        if (musicStarted || !audio.paused) {
+          removeMusicListeners();
+          return;
+        }
+
+        await tryPlayMusic();
+      }
+
+
+      // Remove interaction listeners
+      function removeMusicListeners() {
+
+        document.removeEventListener("click", resumeMusic);
+        document.removeEventListener("pointerdown", resumeMusic);
+        document.removeEventListener("touchstart", resumeMusic);
+        document.removeEventListener("wheel", resumeMusic);
+        document.removeEventListener("scroll", resumeMusic);
+        document.removeEventListener("keydown", resumeMusic);
+
+      }
+
+
+      // Listen for interactions
+      document.addEventListener("click", resumeMusic);
+      document.addEventListener("pointerdown", resumeMusic);
+      document.addEventListener("touchstart", resumeMusic);
+      document.addEventListener("wheel", resumeMusic);
+      document.addEventListener("scroll", resumeMusic);
+      document.addEventListener("keydown", resumeMusic);
+
+
+      // ==============================
+      // Music Toggle Button
+      // ==============================
+
+      musicToggle.addEventListener("click", async () => {
+
+        if (audio.paused) {
+
+          await tryPlayMusic();
+
+        } else {
+
+          audio.pause();
+
+          updateMusicUI(false);
+
+        }
+
+      });
+
+
+      // Update button when audio changes
+      audio.addEventListener("play", () => {
+        updateMusicUI(true);
+      });
+
+      audio.addEventListener("pause", () => {
+        updateMusicUI(false);
+      });
+
+
+      // Audio loading errors
+      audio.addEventListener("error", () => {
+        musicLabel.textContent = "مشکل در بارگذاری آهنگ";
+      });
+
+
+      // ==============================
+      // Image Fallback
+      // ==============================
+
+      document
+        .querySelectorAll(".gallery-card img, .photo-frame img")
+        .forEach((img) => {
+
+          img.addEventListener("error", () => {
+            img.style.display = "none";
+          });
+
+        });
+
+
+      // ==============================
+      // Confetti Animation
+      // ==============================
+
+      function launchConfetti() {
+
+        if (
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+          return;
+        }
+
+        const colors = [
+          "#ff705e",
+          "#ffb650",
+          "#f6a6bb",
+          "#9bcdb6",
+          "#b5a0ec",
+          "#ffd66f"
+        ];
+
+        for (let i = 0; i < 48; i++) {
+
+          const bit = document.createElement("span");
+
+          bit.className = "confetti";
+
+          bit.style.left = `${Math.random() * 100}vw`;
+
+          bit.style.background =
+            colors[i % colors.length];
+
+          bit.style.setProperty(
+            "--drift",
+            `${Math.random() * 180 - 90}px`
+          );
+
+          bit.style.animationDuration =
+            `${3.8 + Math.random() * 2.8}s`;
+
+          bit.style.animationDelay =
+            `${Math.random() * 0.8}s`;
+
+          document.body.appendChild(bit);
+
+          window.setTimeout(() => {
+            bit.remove();
+          }, 7500);
+
+        }
+
+      }
+
+    </script>
   </body>
 </html>
